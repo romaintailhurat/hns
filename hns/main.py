@@ -4,6 +4,7 @@
 import requests
 import json
 from bs4 import BeautifulSoup
+from datetime import date
 
 HN_URL = "https://news.ycombinator.com/"
 LOGIN_URL = "https://news.ycombinator.com/login"
@@ -39,6 +40,7 @@ upvote_path = "upvoted?id=romaintailhurat"
 stories = []
 
 while more:
+    print(f"Parsing {upvote_path}")
     target = f"{HN_URL}{upvote_path}"
     resp_upvoted = requests.get(target, cookies=req_cookies)
     html = BeautifulSoup(resp_upvoted.text, "html.parser")
@@ -51,6 +53,9 @@ while more:
         upvote_path = morelink[0]["href"]
 
 data = {}
+d = date.today()
+data["updated"] = d.strftime("%d/%m/%y")
+data["count"] = len(stories)
 
 for idx, story in enumerate(stories):
     data[idx] = {"text": story.text, "link": story["href"]}

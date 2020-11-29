@@ -19,3 +19,11 @@ It will create a `stories.json` file containing your upvoted stories titles and 
 ## Dev
 
 Using poetry with VS Code : https://olav.it/2019/11/16/configuring-poetry-in-visual-studio-code/
+
+Parsing the resulting JSON file :
+
+```bash
+cat stories.json | jq .
+cat stories.json | jq .count
+cat stories.json | jq .updated
+```
