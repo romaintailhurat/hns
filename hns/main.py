@@ -6,6 +6,8 @@ import json
 from bs4 import BeautifulSoup
 from datetime import date
 import click
+from urllib.parse import urlparse
+import pickle
 
 HN_URL = "https://news.ycombinator.com/"
 LOGIN_URL = "https://news.ycombinator.com/login"
@@ -79,6 +81,43 @@ def checkhn():
 @hns.command()
 def extract():
     extract_hn_upvoted()
+
+
+@hns.command()
+def extractstoriescontent():
+    try:
+        with open("stories.json") as stf:
+            d = json.load(stf)
+            stories = {k: v for (k, v) in d.items() if k !=
+                       "updated" and k != "count"}
+
+            word_dict = {}
+            for key, story in stories.items():
+                story_link = story["link"]
+                print(f"Scraping text content from {story_link}")
+                parsed_url = urlparse(story_link)
+                if all([parsed_url.scheme, parsed_url.netloc]):
+                    try:
+                        resp = requests.get(story_link)
+                        if resp.ok:
+                            print("HTTP request ok, processing content")
+                            html = BeautifulSoup(resp.text, "html.parser")
+                            ps = html.find_all("p")
+                            words = [p.text for p in ps]
+                            word_dict[key] = words
+                        else:
+                            print(
+                                f"Problem with the HTTP call, status is {resp.status_code}")
+                    except:
+                        print("Something went wrong")
+                else:
+                    print("-> skipping, not a URL")
+            # writing words to file
+            with open("hnwords.pickle", "wb") as hnwords_file:
+                print("Creating words file")
+                pickle.dump(word_dict, hnwords_file)
+    except IOError as e:
+        print(e)
 
 
 if __name__ == "__main__":

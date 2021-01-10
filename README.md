@@ -1,5 +1,10 @@
 # Get your Hacker News upvoted stories
 
+## TODOs
+
+- move the secrets file outside the git repo ; add option `hns <command> --secrets /path/to/secrets.json`
+- create specific CLI entry points with options (eg `hns hn`)
+
 ## How to run
 
 Create a `secrets.json` file at the root of the project, with this layout:
